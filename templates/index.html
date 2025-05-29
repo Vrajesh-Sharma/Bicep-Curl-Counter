@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Bicep Curl Counter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bicep Curl Counter!</h1>
+        <p>Instructions:</p>
+        <ul>
+            <li>Place yourself in front of the webcam.</li>
+            <li>Perform bicep curls, and the counter will count your repetitions automatically.</li>
+            <li>Click the 'Start Counter' button to begin.</li>
+        </ul>
+        <button onclick="window.location.href='/counter'">Start Counter</button>
+    </div>
+</body>
+</html>

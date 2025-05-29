@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bicep Curl Counter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bicep Curl Counter</h1>
+
+        <div class="video-feed" id="webcam-feed">
+            <div id="loading-animation">
+                <p id="loading-message">Loading webcam feed...</p>
+            </div>
+        </div>
+        
+        <button onclick="resetCounter()">Reset Counter</button>
+        <button onclick="closeCounter()">Close Counter</button>
+    </div>
+    <script>
+        window.onload = function () {
+            const webcamFeed = document.getElementById('webcam-feed');
+            const loadingAnimation = document.getElementById('loading-animation');
+            const loadingMessage = document.getElementById('loading-message');
+    
+            // Set the webcam feed as an image
+            const img = document.createElement('img');
+            img.src = "{{ url_for('video_feed') }}";  // URL to your video feed
+            img.style.borderRadius = "10px";
+            
+            img.onload = function() {
+                // Hide the loading animation once the webcam feed is ready
+                loadingAnimation.style.display = "none";
+                webcamFeed.appendChild(img);
+            };
+    
+            img.onerror = function() {
+                loadingMessage.innerText = "Failed to load webcam feed.";
+            };
+        };
+    
+        function resetCounter() {
+            fetch('/reset-counter', {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                leftCountDisplay.innerText = data.left_count;
+                rightCountDisplay.innerText = data.right_count;
+            });
+        }
+    
+        function closeCounter() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html> 
