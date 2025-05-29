@@ -5,21 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bicep Curl Counter</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="counter-page">
     <div class="container">
-        <h1>Bicep Curl Counter</h1>
-
-        <div class="video-feed" id="webcam-feed">
-            <div id="loading-animation">
-                <p id="loading-message">Loading webcam feed...</p>
+        <div class="header">
+            <h1 class="title">Bicep Curl Counter</h1>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                AI Tracking Active
             </div>
         </div>
-        
-        <button onclick="resetCounter()">Reset Counter</button>
-        <button onclick="closeCounter()">Close Counter</button>
+
+        <div class="main-content">
+            <div class="video-section">
+                <div class="video-feed" id="webcam-feed">
+                    <div id="loading-animation">
+                        <div class="loading-spinner"></div>
+                        <p id="loading-message">Initializing webcam feed...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="stats-section">
+                    <h3 class="stats-title">Workout Stats</h3>
+                    <div class="rep-counter">
+                        <div class="rep-number" id="rep-count">0</div>
+                        <div class="rep-label">Total Reps</div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <button class="control-button reset-button" onclick="resetCounter()">
+                        Reset Counter
+                    </button>
+                    <button class="control-button close-button" onclick="closeCounter()">
+                        End Workout
+                    </button>
+                </div>
+
+                <div class="workout-info">
+                    <div class="info-item">
+                        <span>Session Time</span>
+                        <span class="info-value" id="session-time">00:00</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Avg. Form</span>
+                        <span class="info-value">Good</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Status</span>
+                        <span class="info-value">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <script>
+        let sessionStartTime = Date.now();
+        
+        // Update session timer
+        function updateSessionTime() {
+            const elapsed = Date.now() - sessionStartTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            document.getElementById('session-time').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        setInterval(updateSessionTime, 1000);
+
         window.onload = function () {
             const webcamFeed = document.getElementById('webcam-feed');
             const loadingAnimation = document.getElementById('loading-animation');
@@ -28,7 +85,6 @@
             // Set the webcam feed as an image
             const img = document.createElement('img');
             img.src = "{{ url_for('video_feed') }}";  // URL to your video feed
-            img.style.borderRadius = "10px";
             
             img.onload = function() {
                 // Hide the loading animation once the webcam feed is ready
@@ -37,7 +93,8 @@
             };
     
             img.onerror = function() {
-                loadingMessage.innerText = "Failed to load webcam feed.";
+                loadingMessage.innerText = "Failed to load webcam feed";
+                document.querySelector('.loading-spinner').style.display = 'none';
             };
         };
     
@@ -47,8 +104,19 @@
             })
             .then(response => response.json())
             .then(data => {
-                leftCountDisplay.innerText = data.left_count;
-                rightCountDisplay.innerText = data.right_count;
+                document.getElementById('rep-count').textContent = '0';
+                // Reset session time
+                sessionStartTime = Date.now();
+                // Add visual feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Reset!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1000);
+            })
+            .catch(error => {
+                console.error('Error resetting counter:', error);
             });
         }
     
@@ -57,4 +125,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
